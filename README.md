@@ -1,1 +1,1 @@
-# tutorials
+# jvmtorch-tutorials
