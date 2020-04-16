@@ -13,22 +13,27 @@
  */
 package org.jvmtorch.tutorials.beginner.blitz;
 
-import static org.jvmpy.python.Python.*;
+import static org.jvmpy.python.Python.True;
+import static org.jvmpy.python.Python.len;
+import static org.jvmpy.python.Python.list;
+import static org.jvmpy.python.Python.print;
+import static org.jvmpy.python.Python.tuple;
+import static org.jvmtorch.JvmTorch.nn;
+import static org.jvmtorch.JvmTorch.optim;
+import static org.jvmtorch.JvmTorch.torch;
 
-// JvmTorch imports
-import static org.jvmtorch.JvmTorch.*;
+import java.util.logging.LogManager;
 
-import org.jvmtorch.nn.modules.Module;
-import org.jvmtorch.nn.*;
+import org.jvmtorch.nn.Conv2d;
+import org.jvmtorch.nn.Linear;
+import org.jvmtorch.nn.Module;
+import org.jvmtorch.nn.NN;
+import org.jvmtorch.torch.Size;
 import org.jvmtorch.torch.Tensor;
-import org.jvmtorch.torch.TensorOperations;
-
 // Spring imports
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.logging.LogManager;
 
 /**
  * Based on PyTorch tutorial at:
@@ -46,7 +51,7 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 	}
 
 	static {
-		// Quieten Logging for JBlas
+		// Optional - quieten Logging for JBlas
 		org.jblas.util.Logger.getLogger().setLevel(org.jblas.util.Logger.ERROR);
 		LogManager.getLogManager().reset();
 	}
@@ -63,15 +68,15 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 	 * import org.jvmtorch.torch.TensorOperations;
 	 * 
 	 **/
-	public static class Net<T extends TensorOperations<T>> extends Module<Net<T>, T> {
+	public static class Net extends Module<Net> {
 
-		protected Conv2d<?, T> conv1;
-		protected Conv2d<?, T> conv2;
-		protected Linear<?, T> fc1;
-		protected Linear<?, T> fc2; // Implementing ModuleAttributes provides a num_flat_feature() method
-		protected Linear<?, T> fc3;
+		protected Conv2d<?> conv1;
+		protected Conv2d<?> conv2;
+		protected Linear<?> fc1;
+		protected Linear<?> fc2; // Implementing ModuleAttributes provides a num_flat_feature() method
+		protected Linear<?> fc3;
 
-		public Net(NN<T> nn) {
+		public Net(NN nn) {
 			super(nn);
 			// # 1 input image channel, 6 output channels, 3x3 square convolution
 			// # kernel
@@ -84,22 +89,22 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 		}
 
 		@Override
-		public Tensor<T> forward(Tensor<T> x) {
+		public Tensor forward(Tensor x) {
 
 			// Max pooling over a (2, 2) window
-			x = F.max_pool2d(F.relu(self.conv1.apply(x)), inttuple(2, 2));
+			x = F.max_pool2d(self.conv1.apply(x), Size(2, 2));
 			// # If the size is a square you can only specify a single number
-			x = F.max_pool2d(F.relu(self.conv2.apply(x)), 2);
-			x = x.view(-1, self.num_flat_features(x));
-			x = F.relu(self.fc1.apply(x));
-			x = F.relu(self.fc2.apply(x));
+			x = F.max_pool2d(self.conv2.apply(x), 2);
+			//x = x.view(-1, self.num_flat_features(x));
+			x = self.fc1.apply(x);
+			x = self.fc2.apply(x);
 			x = self.fc3.apply(x);
 			return x;
 		}
 
-		protected int num_flat_features(Tensor<?> x) {
+		protected int num_flat_features(Tensor x) {
 			// int size = x.size()[1:] # all dimensions except the batch dimension
-			int[] size = x.size().getDimensions();
+			int[] size = x.size().dimensions();
 			var num_features = 1;
 			for (var s : size)
 				num_features *= s;
@@ -107,7 +112,7 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 		}
 
 		@Override
-		protected Net<T> self() {
+		protected Net self() {
 			return this;
 		}
 	}
@@ -115,13 +120,8 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 	@Override
 	public void run(String... args)  {
 
-		var x = torch.ones(2, 2);
-		x.data()[1] = 3;
-
-		print(x);
-
 		// Let’s create our network:
-		var net = new Net<>(nn);
+		var net = new Net(nn);
 		print(net);
 
 		// You just have to define the forward function, and the backward function
@@ -145,13 +145,13 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 		 * import static org.jvmtorch.JvmTorch.*;
 		 */
 
-		var input = torch.randn(1, 32 * 32).requires_grad_(True);
+		var input = torch.randn(new Size(new Size(1), new Size(1, 32, 32))).requires_grad_(True).names_(tuple("example", "input_depth", "input_height", "input_width"));
 		var out = net.apply(input);
 		print(out);
 
 		// Zero the gradient buffers of all parameters and backprops with random gradients:
 		net.zero_grad();
-		out.backward(torch.randn(10));
+		out.backward(torch.randn(new Size(1, 10).names_(tuple("example", "feature"))));
 
 		// A loss function takes the (output, target) pair of inputs, and computes a
 		// value that estimates how far away the output is from the target.
@@ -160,14 +160,15 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 		// A simple loss is: nn.MSELoss which computes the mean-squared error between the input and the target.
 
 		// For example:
-
+		
 		var output = net.apply(input);
-		var target = torch.randn(10); // # a dummy target, for example
-		target = target.view(1, -1); // # make it the same shape as output
+		var target = torch.randn(new Size(1, 10)).names_(tuple("example", "feature")); // # a dummy target, for example
+		//target = target.view(1, -1); // # make it the same shape as output
 		var criterion = nn.MSELoss();
 
 		var loss = criterion.apply(output, target);
 		print(loss);
+
 
 		// Now, if you follow loss in the backward direction, using its .grad_fn
 		// attribute, you will see a graph of computations that looks like this:
@@ -196,13 +197,12 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 
 		print("conv1.bias.grad before backward");
 
-		print(net.conv1.bias().grad());
+		print(net.conv1.weight().grad());
 
 		loss.backward();
 
 		print("conv1.bias.grad after backward");
-		print(net.conv1.bias().grad());
-
+		print(net.conv1.weight().grad());
 		// However, as you use neural networks, you want to use various different update
 		// rules such as SGD, Nesterov-SGD, Adam, RMSProp, etc. 
 		// To enable this, we built a small package: optim that implements all these methods. 
