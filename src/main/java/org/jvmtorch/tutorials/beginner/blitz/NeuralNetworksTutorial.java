@@ -28,7 +28,6 @@ import org.jvmtorch.nn.Conv2d;
 import org.jvmtorch.nn.Linear;
 import org.jvmtorch.nn.Module;
 import org.jvmtorch.nn.NN;
-import org.jvmtorch.torch.Size;
 import org.jvmtorch.torch.Tensor;
 // Spring imports
 import org.springframework.boot.CommandLineRunner;
@@ -145,13 +144,13 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 		 * import static org.jvmtorch.JvmTorch.*;
 		 */
 
-		var input = torch.randn(new Size(new Size(1), new Size(1, 32, 32))).requires_grad_(True).names_(tuple("example", "input_depth", "input_height", "input_width"));
+		var input = torch.randn(torch.Size(torch.Size(1), torch.Size(1, 32, 32))).requires_grad_(True).names_(tuple("example", "input_depth", "input_height", "input_width"));
 		var out = net.apply(input);
 		print(out);
 
 		// Zero the gradient buffers of all parameters and backprops with random gradients:
 		net.zero_grad();
-		out.backward(torch.randn(new Size(1, 10).names_(tuple("example", "feature"))));
+		out.backward(torch.randn(torch.Size(1, 10).names_(tuple("example", "feature"))));
 
 		// A loss function takes the (output, target) pair of inputs, and computes a
 		// value that estimates how far away the output is from the target.
@@ -162,7 +161,7 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 		// For example:
 		
 		var output = net.apply(input);
-		var target = torch.randn(new Size(1, 10)).names_(tuple("example", "feature")); // # a dummy target, for example
+		var target = torch.randn(torch.Size(1, 10)).names_(tuple("example", "feature")); // # a dummy target, for example
 		//target = target.view(1, -1); // # make it the same shape as output
 		var criterion = nn.MSELoss();
 
