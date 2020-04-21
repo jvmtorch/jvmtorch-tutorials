@@ -92,9 +92,12 @@ public class AutogradTutorial implements CommandLineRunner {
 		x = torch.randn(3).requires_grad_(True);
 
 		y = x.mul(2);
+		
+		var y_norm_data = y.norm().getDataAsFloatArray();
 	
-		for (int i = 0; i < 100; i++) {
+		while (y_norm_data[0] < 1000 && y_norm_data[1] < 1000 && y_norm_data[2] < 1000) {
 			y = y.mul(2);
+			y_norm_data = y.norm().getDataAsFloatArray();
 		}
 
 		print(y);

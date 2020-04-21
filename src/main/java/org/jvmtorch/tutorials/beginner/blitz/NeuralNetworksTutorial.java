@@ -79,12 +79,12 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 			super(nn);
 			// # 1 input image channel, 6 output channels, 3x3 square convolution
 			// # kernel
-			self.conv1 = nn.Conv2d(1, 6, 5);
-			self.conv2 = nn.Conv2d(6, 16, 5);
+			self.conv1 = nn.Conv2d(1, 6, 5).alias_("conv1");
+			self.conv2 = nn.Conv2d(6, 16, 5).alias_("conv2");;
 			// an affine operation: y = Wx + b
-			self.fc1 = nn.Linear(16 * 5 * 5, 120); // # 5*5 from image dimension
-			self.fc2 = nn.Linear(120, 84);
-			self.fc3 = nn.Linear(84, 10);
+			self.fc1 = nn.Linear(16 * 5 * 5, 120).alias_("fc1");; // # 5*5 from image dimension
+			self.fc2 = nn.Linear(120, 84).alias_("fc2");;
+			self.fc3 = nn.Linear(84, 10).alias_("fc3");;
 		}
 
 		@Override
@@ -132,6 +132,8 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 
 		var params = list(net.parameters());
 		print(len(params));
+		print(params[0]);
+
 		print(params[0].size()); // # conv1's .weight
 
 		// Let’s try a random 32x32 input. Note: expected input size of this net (LeNet) is 32x32.
@@ -145,6 +147,7 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 		 */
 
 		var input = torch.randn(torch.Size(torch.Size(1), torch.Size(1, 32, 32))).requires_grad_(True).names_(tuple("example", "input_depth", "input_height", "input_width"));
+				
 		var out = net.apply(input);
 		print(out);
 
@@ -196,12 +199,13 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 
 		print("conv1.bias.grad before backward");
 
-		print(net.conv1.weight().grad());
+		print(net.fc1.weight().grad());
 
 		loss.backward();
 
 		print("conv1.bias.grad after backward");
-		print(net.conv1.weight().grad());
+		print(net.fc1.weight().grad());
+		
 		// However, as you use neural networks, you want to use various different update
 		// rules such as SGD, Nesterov-SGD, Adam, RMSProp, etc. 
 		// To enable this, we built a small package: optim that implements all these methods. 
