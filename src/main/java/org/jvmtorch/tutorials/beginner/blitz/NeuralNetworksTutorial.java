@@ -67,7 +67,7 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 	 * import org.jvmtorch.torch.TensorOperations;
 	 * 
 	 **/
-	public static class Net extends Module<Net> {
+	public static class Net extends Module<Net, Tensor, Tensor> {
 
 		protected Conv2d<?> conv1;
 		protected Conv2d<?> conv2;
@@ -79,12 +79,12 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 			super(nn);
 			// # 1 input image channel, 6 output channels, 3x3 square convolution
 			// # kernel
-			self.conv1 = nn.Conv2d(1, 6, 5).alias_("conv1");
-			self.conv2 = nn.Conv2d(6, 16, 5).alias_("conv2");;
+			self.conv1 = nn.Conv2d(true, 1, 6, 5).alias_("conv1");
+			self.conv2 = nn.Conv2d(true, 6, 16, 5).alias_("conv2");;
 			// an affine operation: y = Wx + b
-			self.fc1 = nn.Linear(16 * 5 * 5, 120).alias_("fc1");; // # 5*5 from image dimension
-			self.fc2 = nn.Linear(120, 84).alias_("fc2");;
-			self.fc3 = nn.Linear(84, 10).alias_("fc3");;
+			self.fc1 = nn.Linear(false, 16 * 5 * 5, 120).alias_("fc1");; // # 5*5 from image dimension
+			self.fc2 = nn.Linear(false, 120, 84).alias_("fc2");;
+			self.fc3 = nn.Linear(false, 84, 10).alias_("fc3");;
 		}
 
 		@Override

@@ -24,9 +24,14 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.jvmpy</groupId>
+			<artifactId>jvmpy-python</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>org.jvmtorch</groupId>
 			<artifactId>jvmtorch</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -73,6 +78,38 @@
 			</url>
 			<snapshots>
 				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>ml4j-releases</id>
+			<url>https://raw.githubusercontent.com/ml4j/mvn-repository/master/releases
+			</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>ml4j-snapshots</id>
+			<url>https://raw.githubusercontent.com/ml4j/mvn-repository/master/snapshots
+			</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jvmpy-snapshots</id>
+			<url>https://raw.githubusercontent.com/jvmpy/mvn-repository/master/snapshots
+			</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>spring-libs-release</id>
+			<url>https://repo.spring.io/libs-release/
+			</url>
+			<snapshots>
+				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 	</repositories>
