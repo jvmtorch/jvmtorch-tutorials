@@ -24,12 +24,10 @@ import static org.jvmtorch.JvmTorch.torch;
 
 import java.util.logging.LogManager;
 
-import org.jvmtorch.nn.Conv2d;
-import org.jvmtorch.nn.Linear;
-import org.jvmtorch.nn.Module;
-import org.jvmtorch.nn.NN;
-import org.jvmtorch.torch.Tensor;
+import org.jvmtorch.nn.*;
 // Spring imports
+import org.jvmtorch.nn.Module;
+import org.jvmtorch.torch.Tensor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
