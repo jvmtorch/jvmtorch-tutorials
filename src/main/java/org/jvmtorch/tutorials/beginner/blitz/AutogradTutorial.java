@@ -45,7 +45,7 @@ public class AutogradTutorial implements CommandLineRunner {
 
 	@Override
 	public void run(String... args)  {
-		
+
 		// Create a tensor and set requires_grad=True to track computation with it
 		var x = torch.ones(2, 2).requires_grad_(True);
 		print(x);
@@ -56,7 +56,7 @@ public class AutogradTutorial implements CommandLineRunner {
 		print(y);
 		
 		// y was created as a result of an operation, so it has a grad_fn.
-		print(y.grad_fn());
+		//print(y.grad_fn());  // No grad function in latest implementation.
 		
 		// Do more operations on y
 		var z = y.mul(y).mul(3);
@@ -64,6 +64,8 @@ public class AutogradTutorial implements CommandLineRunner {
 
 		print(z);
 		print(out);
+
+
 		
 		// .requires_grad_( ... ) changes an existing Tensor’s requires_grad flag in-place. 
 		// The input flag defaults to False if not given.
@@ -75,7 +77,7 @@ public class AutogradTutorial implements CommandLineRunner {
 		a.requires_grad_(True);
 		print(a.requires_grad());
 		var b = (a.mul(a)).sum();
-		print(b.grad_fn());
+		//print(b.grad_fn()); // No grad function in latest implementation.
 		
 		// Let’s backprop now. Because out contains a single scalar, out.backward() 
 		// is equivalent to out.backward(torch.tensor(1.)).
@@ -110,7 +112,7 @@ public class AutogradTutorial implements CommandLineRunner {
 		y.backward(v);
 
 		print(x.grad());
-		
+
 	}
 
 }

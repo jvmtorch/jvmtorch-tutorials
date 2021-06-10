@@ -145,7 +145,7 @@ public class NeuralNetworksTutorial implements CommandLineRunner {
 		 */
 
 		var input = torch.randn(torch.Size(torch.Size(1), torch.Size(1, 32, 32))).requires_grad_(True).names_(tuple("example", "input_depth", "input_height", "input_width"));
-				
+
 		var out = net.apply(input);
 		print(out);
 
